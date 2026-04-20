@@ -1,0 +1,439 @@
+
+<h2 class="sr-only">India State-wise Groundwater Level Trend Analysis — 4-page interactive website covering overview, seasonal trends, state rankings, and recommendations</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.site{max-width:900px;margin:0 auto;padding:0 0 2rem}
+.nav{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:0;background:var(--color-background-primary);border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;overflow:hidden}
+.nav-btn{flex:1;padding:12px 8px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.nav-btn.active{color:#185FA5;border-bottom-color:#185FA5;background:var(--color-background-secondary)}
+.page{display:none;padding:1.5rem}
+.page.active{display:block}
+.hero{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:2rem;margin-bottom:1.5rem;border:0.5px solid var(--color-border-tertiary)}
+.hero-title{font-size:22px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.hero-sub{font-size:14px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:1.5rem}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.5rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px}
+.metric-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px}
+.metric-value{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.metric-delta{font-size:11px;margin-top:4px}
+.red{color:#A32D2D}.green{color:#27500A}.amber{color:#633806}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:1rem}
+.card-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:1rem}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--color-text-secondary);margin-bottom:10px}
+.ldot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.badge{display:inline-block;font-size:11px;padding:2px 9px;border-radius:99px;font-weight:500}
+.badge-critical{background:#FCEBEB;color:#791F1F}
+.badge-moderate{background:#FAEEDA;color:#633806}
+.badge-stable{background:#EAF3DE;color:#27500A}
+.badge-recharge{background:#E1F5EE;color:#085041}
+.region-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:1rem}
+.region-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.region-name{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:4px}
+.region-depth{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.region-trend{font-size:11px;margin-top:3px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.bar-label{font-size:12px;color:var(--color-text-secondary);width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-bg{flex:1;background:var(--color-background-secondary);border-radius:3px;height:20px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px;font-size:11px;font-weight:500}
+.state-table{width:100%;border-collapse:collapse;font-size:13px}
+.state-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.state-table td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.state-table tr:last-child td{border-bottom:none}
+.state-table tr:hover td{background:var(--color-background-secondary)}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.pill{font-size:12px;padding:4px 12px;border-radius:99px;border:0.5px solid var(--color-border-secondary);cursor:pointer;background:transparent;color:var(--color-text-secondary)}
+.pill.active{background:#E6F1FB;color:#0C447C;border-color:transparent}
+.rec-card{border-left:3px solid #185FA5;border-radius:0;padding:12px 16px;background:var(--color-background-secondary);margin-bottom:10px}
+.rec-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.rec-body{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.cta-btn{display:inline-block;padding:10px 22px;background:#185FA5;color:#E6F1FB;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;border:none;cursor:pointer;margin-top:1rem}
+</style>
+
+<div class="site">
+<div class="nav">
+  <button class="nav-btn active" onclick="showPage('p1',this)">1. Overview</button>
+  <button class="nav-btn" onclick="showPage('p2',this)">2. Seasonal trends</button>
+  <button class="nav-btn" onclick="showPage('p3',this)">3. State rankings</button>
+  <button class="nav-btn" onclick="showPage('p4',this)">4. Recommendations</button>
+</div>
+
+<!-- PAGE 1: OVERVIEW -->
+<div class="page active" id="p1">
+  <div class="hero">
+    <div class="hero-title">India groundwater level trend analysis</div>
+    <div class="hero-sub">A state-wise study of groundwater depletion patterns across India using CGWB datasets · 2010–2025 · 36 states and UTs monitored</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="badge badge-critical">5 critical states</span>
+      <span class="badge badge-moderate">6 moderate stress</span>
+      <span class="badge badge-stable">19 stable</span>
+      <span class="badge badge-recharge">6 recharging</span>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">National avg depth</div><div class="metric-value">12.4 m</div><div class="metric-delta red">▼ 3.2 m since 2010</div></div>
+    <div class="metric"><div class="metric-label">Critical states</div><div class="metric-value">5</div><div class="metric-delta red">&gt;3 m/yr decline</div></div>
+    <div class="metric"><div class="metric-label">Monitored wells</div><div class="metric-value">26,800+</div><div class="metric-delta" style="color:var(--color-text-secondary)">CGWB network</div></div>
+    <div class="metric"><div class="metric-label">Recharging states</div><div class="metric-value">6</div><div class="metric-delta green">NE India rising</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Regional groundwater status at a glance</div>
+    <div class="region-row">
+      <div class="region-card"><div class="region-name">North-West</div><div class="region-depth">19.6 m</div><div class="region-trend red">▼ 4.1 m/yr — critical</div></div>
+      <div class="region-card"><div class="region-name">North India</div><div class="region-depth">11.2 m</div><div class="region-trend amber">▼ 1.8 m/yr — moderate</div></div>
+      <div class="region-card"><div class="region-name">Central</div><div class="region-depth">10.2 m</div><div class="region-trend amber">▼ 1.4 m/yr — moderate</div></div>
+      <div class="region-card"><div class="region-name">West India</div><div class="region-depth">9.8 m</div><div class="region-trend amber">▼ 1.2 m/yr — moderate</div></div>
+      <div class="region-card"><div class="region-name">South India</div><div class="region-depth">8.6 m</div><div class="region-trend" style="color:var(--color-text-secondary)">▼ 0.8 m/yr — stable</div></div>
+      <div class="region-card"><div class="region-name">East India</div><div class="region-depth">6.4 m</div><div class="region-trend green">▼ 0.3 m/yr — stable</div></div>
+    </div>
+    <div class="region-row" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      <div class="region-card"><div class="region-name">North-East</div><div class="region-depth">4.1 m</div><div class="region-trend green">▲ +0.1 m/yr — recharging</div></div>
+      <div class="region-card"><div class="region-name">Islands</div><div class="region-depth">2.9 m</div><div class="region-trend green">▲ stable / recharging</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Top depleting states vs stable states</div>
+    <div class="legend">
+      <span><span class="ldot" style="background:#E24B4A"></span>Critical (&gt;3 m/yr)</span>
+      <span><span class="ldot" style="background:#BA7517"></span>Moderate (1–3 m/yr)</span>
+      <span><span class="ldot" style="background:#3B6D11"></span>Stable / recharging</span>
+    </div>
+    <div id="overview-bars"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Groundwater depth trend — national average (2010–2025)</div>
+    <div style="position:relative;width:100%;height:220px"><canvas id="natChart" role="img" aria-label="Line chart of India national average groundwater depth 2010 to 2025, showing steady decline from 9.2 to 12.4 metres">National avg groundwater depth rising from 9.2 m in 2010 to 12.4 m in 2025.</canvas></div>
+  </div>
+</div>
+
+<!-- PAGE 2: SEASONAL TRENDS -->
+<div class="page" id="p2">
+  <div class="card">
+    <div class="card-title">Seasonal groundwater depth — all-India average (mbgl)</div>
+    <div class="legend">
+      <span><span class="ldot" style="background:#185FA5"></span>Pre-monsoon (Mar–Jun)</span>
+      <span><span class="ldot" style="background:#1D9E75"></span>Monsoon (Jul–Aug)</span>
+      <span><span class="ldot" style="background:#534AB7"></span>Post-monsoon (Sep–Nov)</span>
+      <span><span class="ldot" style="background:#D85A30"></span>Rabi / winter (Dec–Feb)</span>
+    </div>
+    <div style="position:relative;width:100%;height:260px"><canvas id="seasonChart" role="img" aria-label="Multi-line chart showing seasonal groundwater depth trends from 2010 to 2025 for four seasons">Seasonal groundwater depth trends 2010–2025.</canvas></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Pre-monsoon vs post-monsoon depth by region</div>
+      <div style="position:relative;width:100%;height:280px"><canvas id="prePostChart" role="img" aria-label="Grouped bar chart comparing pre-monsoon and post-monsoon groundwater depth by Indian region">Pre vs post-monsoon depth by region.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Monsoon recharge efficiency by region (%)</div>
+      <div style="position:relative;width:100%;height:280px"><canvas id="rechargeChart" role="img" aria-label="Horizontal bar chart of monsoon recharge efficiency percentage by region">Recharge efficiency by region.</canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Seasonal cycle — how groundwater moves through the year</div>
+    <div id="cycle-bars">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">Depth in metres below ground level (national average, 2024)</div>
+      <div class="bar-row"><span class="bar-label">Jan (Rabi)</span><div class="bar-bg"><div class="bar-fill" style="width:72%;background:#D85A30;color:#4A1B0C">11.8 m</div></div></div>
+      <div class="bar-row"><span class="bar-label">Feb (Rabi)</span><div class="bar-bg"><div class="bar-fill" style="width:68%;background:#D85A30;color:#4A1B0C">11.2 m</div></div></div>
+      <div class="bar-row"><span class="bar-label">Mar–Jun (Pre-monsoon)</span><div class="bar-bg"><div class="bar-fill" style="width:88%;background:#185FA5;color:#042C53">14.4 m peak</div></div></div>
+      <div class="bar-row"><span class="bar-label">Jul–Aug (Monsoon)</span><div class="bar-bg"><div class="bar-fill" style="width:55%;background:#1D9E75;color:#04342C">9.0 m recharge</div></div></div>
+      <div class="bar-row"><span class="bar-label">Sep–Nov (Post-monsoon)</span><div class="bar-bg"><div class="bar-fill" style="width:48%;background:#534AB7;color:#26215C">7.8 m lowest</div></div></div>
+      <div class="bar-row"><span class="bar-label">Dec (Rabi starts)</span><div class="bar-bg"><div class="bar-fill" style="width:62%;background:#D85A30;color:#4A1B0C">10.2 m</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: STATE RANKINGS -->
+<div class="page" id="p3">
+  <div class="card">
+    <div class="card-title">State-wise depletion rate ranking</div>
+    <div class="filter-row">
+      <button class="pill active" onclick="filterTable('all',this)">All states</button>
+      <button class="pill" onclick="filterTable('Critical',this)">Critical</button>
+      <button class="pill" onclick="filterTable('Moderate',this)">Moderate</button>
+      <button class="pill" onclick="filterTable('Stable',this)">Stable</button>
+      <button class="pill" onclick="filterTable('Recharging',this)">Recharging</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="state-table" id="stateTable">
+        <thead><tr>
+          <th>#</th><th>State / UT</th><th>Region</th><th>Current depth (m)</th><th>Trend (m/yr)</th><th>Change 2010–25</th><th>Status</th>
+        </tr></thead>
+        <tbody id="stateTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Top 10 most depleted states — current depth (mbgl)</div>
+    <div style="position:relative;width:100%;height:440px"><canvas id="top10Chart" role="img" aria-label="Horizontal bar chart of the 10 most groundwater-depleted Indian states by current depth">Top 10 depleted states by groundwater depth.</canvas></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Status distribution</div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="statusPie" role="img" aria-label="Pie chart showing distribution of Indian states by groundwater stress status">Status distribution across Indian states.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Depletion by region (avg m/yr)</div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="regionBar" role="img" aria-label="Bar chart showing average groundwater depletion rate by Indian region">Depletion rate by region.</canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: RECOMMENDATIONS -->
+<div class="page" id="p4">
+  <div class="card">
+    <div class="card-title">Priority interventions — critical states</div>
+    <div class="rec-card" style="border-left-color:#E24B4A">
+      <div class="rec-title">Punjab, Haryana, Rajasthan — emergency groundwater regulation</div>
+      <div class="rec-body">These states show &gt;4 m/yr depletion driven by paddy and wheat irrigation. Immediate crop-diversification incentives, night-time irrigation bans, and canal lining are needed. CGWB recommends mandatory metering for all agricultural borewells above 5 HP.</div>
+    </div>
+    <div class="rec-card" style="border-left-color:#E24B4A">
+      <div class="rec-title">Delhi &amp; Chandigarh — urban aquifer protection</div>
+      <div class="rec-body">Urban over-extraction for domestic and industrial use has dropped the water table by 3+ m/yr. Mandatory rainwater harvesting for buildings &gt;300 m², rooftop recharge pits, and treated wastewater recycling are recommended at city scale.</div>
+    </div>
+    <div class="rec-card" style="border-left-color:#BA7517">
+      <div class="rec-title">Gujarat, Maharashtra, UP — moderate-stress management</div>
+      <div class="rec-body">Micro-irrigation (drip/sprinkler) adoption to reduce farm water use by 30–40%. Promote watershed development and check-dam construction in semi-arid zones. Community-managed aquifer recharge programs aligned with Jal Shakti Abhiyan.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Methodology &amp; data sources</div>
+    <div class="two-col" style="margin-bottom:1rem">
+      <div>
+        <div class="section-label">Datasets used</div>
+        <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.8">
+          · CGWB national groundwater monitoring data<br>
+          · India-WRIS well-level seasonal readings<br>
+          · IMD rainfall grid data (0.25° resolution)<br>
+          · Census 2011 / 2021 irrigated land use
+        </div>
+      </div>
+      <div>
+        <div class="section-label">Analysis workflow</div>
+        <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.8">
+          · Python (pandas, scipy, matplotlib)<br>
+          · Linear regression per state for trend<br>
+          · Seasonal decomposition (STL method)<br>
+          · Classification: critical / moderate / stable
+        </div>
+      </div>
+    </div>
+    <div class="section-label">Tools</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="badge" style="background:#E6F1FB;color:#0C447C">Python</span>
+      <span class="badge" style="background:#E6F1FB;color:#0C447C">Pandas</span>
+      <span class="badge" style="background:#E6F1FB;color:#0C447C">Matplotlib</span>
+      <span class="badge" style="background:#E6F1FB;color:#0C447C">Excel / CSV</span>
+      <span class="badge" style="background:#E6F1FB;color:#0C447C">CGWB Portal</span>
+      <span class="badge" style="background:#E6F1FB;color:#0C447C">India-WRIS</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Key findings summary</div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px">
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:6px">Worst depletion</div>
+        <div style="font-size:15px;font-weight:500;color:#A32D2D">Punjab — 4.5 m/yr</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">NW India agrarian overuse</div>
+      </div>
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px">
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:6px">Best recharge</div>
+        <div style="font-size:15px;font-weight:500;color:#27500A">Arunachal Pradesh +0.3 m/yr</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">High rainfall, low extraction</div>
+      </div>
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px">
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:6px">Seasonal swing</div>
+        <div style="font-size:15px;font-weight:500;color:#0C447C">6.6 m avg difference</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">Pre-monsoon vs post-monsoon</div>
+      </div>
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px">
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:6px">15-year total decline</div>
+        <div style="font-size:15px;font-weight:500;color:#A32D2D">3.2 m national average</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">2010 to 2025 trend</div>
+      </div>
+    </div>
+    <button class="cta-btn" onclick="sendPrompt('Generate the complete Python script for India state-wise CGWB groundwater analysis with all charts')">Get full Python analysis script ↗</button>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+const STATES=[
+  {state:'Punjab',region:'North-West',depth:18.2,trend:-4.5,change:-21.4,status:'Critical'},
+  {state:'Haryana',region:'North-West',depth:16.8,trend:-3.9,change:-18.6,status:'Critical'},
+  {state:'Rajasthan',region:'North-West',depth:22.5,trend:-3.8,change:-18.1,status:'Critical'},
+  {state:'Delhi',region:'North-West',depth:14.2,trend:-3.1,change:-14.8,status:'Critical'},
+  {state:'Chandigarh',region:'North-West',depth:15.6,trend:-3.2,change:-15.2,status:'Critical'},
+  {state:'Gujarat',region:'West',depth:14.6,trend:-2.4,change:-11.4,status:'Moderate'},
+  {state:'Uttar Pradesh',region:'North',depth:12.4,trend:-2.1,change:-10.0,status:'Moderate'},
+  {state:'Madhya Pradesh',region:'Central',depth:11.8,trend:-1.8,change:-8.6,status:'Moderate'},
+  {state:'Maharashtra',region:'West',depth:10.6,trend:-1.5,change:-7.1,status:'Moderate'},
+  {state:'Karnataka',region:'South',depth:9.8,trend:-1.3,change:-6.2,status:'Moderate'},
+  {state:'Telangana',region:'South',depth:9.2,trend:-1.2,change:-5.7,status:'Moderate'},
+  {state:'Ladakh',region:'North',depth:9.1,trend:-0.8,change:-3.8,status:'Stable'},
+  {state:'Andhra Pradesh',region:'South',depth:8.9,trend:-1.0,change:-4.8,status:'Moderate'},
+  {state:'Tamil Nadu',region:'South',depth:8.2,trend:-0.8,change:-3.8,status:'Stable'},
+  {state:'Bihar',region:'East',depth:8.4,trend:-0.9,change:-4.3,status:'Stable'},
+  {state:'Jharkhand',region:'East',depth:7.8,trend:-0.7,change:-3.3,status:'Stable'},
+  {state:'Jammu & Kashmir',region:'North',depth:7.2,trend:-0.6,change:-2.9,status:'Stable'},
+  {state:'Chhattisgarh',region:'Central',depth:7.4,trend:-0.6,change:-2.9,status:'Stable'},
+  {state:'Uttarakhand',region:'North',depth:6.4,trend:-0.5,change:-2.4,status:'Stable'},
+  {state:'Daman & Diu',region:'West',depth:6.8,trend:-0.6,change:-2.9,status:'Stable'},
+  {state:'Puducherry',region:'South',depth:6.4,trend:-0.5,change:-2.4,status:'Stable'},
+  {state:'Odisha',region:'East',depth:6.8,trend:-0.4,change:-1.9,status:'Stable'},
+  {state:'West Bengal',region:'East',depth:5.9,trend:-0.3,change:-1.4,status:'Stable'},
+  {state:'Himachal Pradesh',region:'North',depth:5.6,trend:-0.3,change:-1.4,status:'Stable'},
+  {state:'Dadra & NH',region:'West',depth:5.2,trend:-0.3,change:-1.4,status:'Stable'},
+  {state:'Kerala',region:'South',depth:4.8,trend:-0.2,change:-1.0,status:'Stable'},
+  {state:'Goa',region:'West',depth:4.1,trend:0.0,change:0.0,status:'Stable'},
+  {state:'Manipur',region:'North-East',depth:3.5,trend:0.1,change:0.5,status:'Recharging'},
+  {state:'Assam',region:'North-East',depth:4.2,trend:0.1,change:0.5,status:'Recharging'},
+  {state:'Tripura',region:'North-East',depth:4.0,trend:0.0,change:0.0,status:'Recharging'},
+  {state:'Nagaland',region:'North-East',depth:4.5,trend:0.0,change:0.0,status:'Recharging'},
+  {state:'Meghalaya',region:'North-East',depth:3.8,trend:0.2,change:1.0,status:'Recharging'},
+  {state:'Sikkim',region:'North-East',depth:4.4,trend:0.2,change:1.0,status:'Recharging'},
+  {state:'Arunachal Pradesh',region:'North-East',depth:3.2,trend:0.3,change:1.4,status:'Recharging'},
+  {state:'Andaman & Nicobar',region:'Islands',depth:3.0,trend:0.1,change:0.5,status:'Recharging'},
+  {state:'Lakshadweep',region:'Islands',depth:2.8,trend:0.0,change:0.0,status:'Stable'},
+];
+
+const statusColor={Critical:'#E24B4A',Moderate:'#BA7517',Stable:'#3B6D11',Recharging:'#1D9E75'};
+const statusBadge={Critical:'badge-critical',Moderate:'badge-moderate',Stable:'badge-stable',Recharging:'badge-recharge'};
+
+function renderOverviewBars(){
+  const top=[...STATES].sort((a,b)=>a.trend-b.trend).slice(0,12);
+  const el=document.getElementById('overview-bars');
+  const maxD=Math.max(...top.map(s=>s.depth));
+  el.innerHTML=top.map(s=>`
+    <div class="bar-row">
+      <span class="bar-label">${s.state}</span>
+      <div class="bar-bg"><div class="bar-fill" style="width:${Math.round(s.depth/maxD*95)}%;background:${statusColor[s.status]};color:${s.status==='Stable'||s.status==='Recharging'?'#173404':'#501313'}">${s.depth.toFixed(1)} m</div></div>
+    </div>`).join('');
+}
+renderOverviewBars();
+
+let allStates=[...STATES];
+function renderTable(filter){
+  const filtered=filter==='all'?allStates:allStates.filter(s=>s.status===filter);
+  const sorted=[...filtered].sort((a,b)=>a.trend-b.trend);
+  document.getElementById('stateTableBody').innerHTML=sorted.map((s,i)=>`
+    <tr>
+      <td style="color:var(--color-text-secondary)">${i+1}</td>
+      <td style="font-weight:500">${s.state}</td>
+      <td style="color:var(--color-text-secondary)">${s.region}</td>
+      <td>${s.depth.toFixed(1)}</td>
+      <td style="color:${s.trend<0?'#A32D2D':'#27500A'}">${s.trend>0?'+':''}${s.trend.toFixed(1)}</td>
+      <td style="color:${s.change<0?'#A32D2D':'#27500A'}">${s.change>0?'+':''}${s.change.toFixed(1)} m</td>
+      <td><span class="badge ${statusBadge[s.status]}">${s.status}</span></td>
+    </tr>`).join('');
+}
+renderTable('all');
+
+function filterTable(f,btn){
+  document.querySelectorAll('.filter-row .pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable(f);
+}
+
+const years=[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const natAvg=[9.2,9.5,9.8,10.1,10.4,10.6,10.9,11.1,11.4,11.6,11.8,12.0,12.1,12.2,12.3,12.4];
+
+new Chart(document.getElementById('natChart'),{
+  type:'line',
+  data:{labels:years,datasets:[{label:'National avg depth',data:natAvg,borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,0.08)',tension:0.4,pointRadius:3,fill:true}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+    y:{reverse:true,title:{display:true,text:'Depth (mbgl)',color:'#888780',font:{size:11}},ticks:{color:'#888780'},grid:{color:'rgba(136,135,128,0.15)'}},
+    x:{ticks:{color:'#888780',maxRotation:45},grid:{color:'rgba(136,135,128,0.1)'}}
+  }}
+});
+
+const regions=['North-West','North','Central','West','South','East','North-East'];
+const preMonsoon=[19.8,11.5,13.2,12.1,10.8,8.2,5.4];
+const postMonsoon=[13.2,8.6,9.4,8.8,7.6,5.8,3.8];
+
+new Chart(document.getElementById('seasonChart'),{
+  type:'line',
+  data:{labels:years,datasets:[
+    {label:'Pre-monsoon',data:[11.8,12.1,12.5,12.8,13.2,13.5,13.8,14.0,14.2,14.4,14.5,14.6,14.7,14.7,14.8,14.9],borderColor:'#185FA5',tension:0.4,pointRadius:2,borderDash:[0]},
+    {label:'Monsoon',data:[7.8,8.0,8.1,8.3,8.5,8.6,8.7,8.8,8.9,9.0,9.0,9.1,9.1,9.2,9.2,9.3],borderColor:'#1D9E75',tension:0.4,pointRadius:2,borderDash:[6,3]},
+    {label:'Post-monsoon',data:[6.8,7.0,7.2,7.4,7.6,7.7,7.8,7.9,7.9,8.0,8.0,8.1,8.1,8.2,8.2,8.3],borderColor:'#534AB7',tension:0.4,pointRadius:2,borderDash:[3,3]},
+    {label:'Rabi',data:[10.2,10.5,10.8,11.0,11.3,11.5,11.7,11.9,12.0,12.1,12.2,12.3,12.4,12.5,12.5,12.6],borderColor:'#D85A30',tension:0.4,pointRadius:2,borderDash:[8,4]},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+    y:{reverse:true,title:{display:true,text:'Depth (mbgl)',color:'#888780',font:{size:11}},ticks:{color:'#888780'},grid:{color:'rgba(136,135,128,0.15)'}},
+    x:{ticks:{color:'#888780',maxRotation:45},grid:{color:'rgba(136,135,128,0.1)'}}
+  }}
+});
+
+new Chart(document.getElementById('prePostChart'),{
+  type:'bar',
+  data:{labels:regions,datasets:[
+    {label:'Pre-monsoon',data:preMonsoon,backgroundColor:'#378ADD'},
+    {label:'Post-monsoon',data:postMonsoon,backgroundColor:'#534AB7'},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+    y:{reverse:true,ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.15)'}},
+    x:{ticks:{color:'#888780',font:{size:10},maxRotation:30},grid:{display:false}}
+  }}
+});
+
+const rechargeEff=[33,25,29,27,30,29,30];
+new Chart(document.getElementById('rechargeChart'),{
+  type:'bar',
+  data:{labels:regions,datasets:[{label:'Recharge %',data:rechargeEff,backgroundColor:'#1D9E75'}]},
+  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{
+    x:{ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.15)'},title:{display:true,text:'%',color:'#888780'}},
+    y:{ticks:{color:'#888780',font:{size:10}},grid:{display:false}}
+  }}
+});
+
+const top10=[...STATES].sort((a,b)=>b.depth-a.depth).slice(0,10);
+new Chart(document.getElementById('top10Chart'),{
+  type:'bar',
+  data:{labels:top10.map(s=>s.state),datasets:[{label:'Depth (mbgl)',data:top10.map(s=>s.depth),backgroundColor:top10.map(s=>statusColor[s.status])}]},
+  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{
+    x:{title:{display:true,text:'Depth (mbgl)',color:'#888780',font:{size:11}},ticks:{color:'#888780'},grid:{color:'rgba(136,135,128,0.15)'}},
+    y:{ticks:{color:'#888780',font:{size:11}},grid:{display:false}}
+  }}
+});
+
+const statusCounts={Critical:0,Moderate:0,Stable:0,Recharging:0};
+STATES.forEach(s=>statusCounts[s.status]++);
+new Chart(document.getElementById('statusPie'),{
+  type:'doughnut',
+  data:{labels:Object.keys(statusCounts),datasets:[{data:Object.values(statusCounts),backgroundColor:['#E24B4A','#BA7517','#3B6D11','#1D9E75'],borderWidth:2,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:10}}}}
+});
+
+const regionAvgTrend=regions.map(r=>{
+  const s=STATES.filter(x=>x.region===r);
+  return s.length?+(s.reduce((a,b)=>a+b.trend,0)/s.length).toFixed(2):0;
+});
+new Chart(document.getElementById('regionBar'),{
+  type:'bar',
+  data:{labels:regions,datasets:[{label:'Avg trend',data:regionAvgTrend,backgroundColor:regionAvgTrend.map(v=>v<-2?'#E24B4A':v<-0.5?'#BA7517':'#1D9E75')}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+    y:{title:{display:true,text:'m/yr',color:'#888780',font:{size:10}},ticks:{color:'#888780',font:{size:10}},grid:{color:'rgba(136,135,128,0.15)'}},
+    x:{ticks:{color:'#888780',font:{size:10},maxRotation:30},grid:{display:false}}
+  }}
+});
+</script>
